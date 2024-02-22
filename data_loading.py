@@ -33,7 +33,7 @@ def get_spam_dataset(path: str = "../data/") -> pd.core.frame.DataFrame:
     spam_df['Label'] = spam_df['Label'].map({'ham': 0, 'spam': 1})
     spam_df = spam_df[['Body', 'Label']]
 
+    df=pd.concat([enron_spam_subset_df, ling_spam_df, complete_spam_assassin_df, spam_ham_dataset_df, spam_or_not_spam_df, spam_df])
     # Merging the dataset
-    return pd.concat(
-        [enron_spam_subset_df, ling_spam_df, complete_spam_assassin_df, spam_ham_dataset_df, spam_or_not_spam_df,
-         spam_df])
+    df.dropna(subset=['Body'], inplace=True)
+    return 
