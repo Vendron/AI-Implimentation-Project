@@ -26,6 +26,8 @@ def get_spam_dataset(path: str = "../data/") -> pd.core.frame.DataFrame:
     # ham spam dataset preprocessing
     spam_ham_dataset_df.drop(['Unnamed: 0', 'label'], axis=1, inplace=True)
     spam_ham_dataset_df = spam_ham_dataset_df.rename(columns={'text': 'Body', 'label_num': 'Label'})
+    # spam or not spam dataset preprocessing
+    spam_or_not_spam_df=spam_or_not_spam_df.rename(columns={'email': 'Body', 'label': 'Label'})
     # spam data preprocessing
     spam_df = spam_df.rename(columns={'Message': 'Body', 'Category': 'Label'})
     spam_df['Label'] = spam_df['Label'].map({'ham': 0, 'spam': 1})
