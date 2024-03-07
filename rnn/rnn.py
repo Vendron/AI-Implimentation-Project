@@ -1,10 +1,9 @@
-# Issues with RNN2
-# The model was overfitting the data.
+# Issues with RNN3
+# The model was plotting each fold separately.
 
-# In this update, 
-# L1 and L2 regularization are added to the model.
-# Cross Validation is implemented to prevent overfitting.
-# Dropout layers are used to prevent overfitting.
+# In this update,
+# The model is plotted only once after the cross-validation process.
+# The model is saved to a file after the cross-validation process.
 
 import pandas as pd
 import numpy as np
@@ -26,9 +25,10 @@ LSTM_UNITS = 100 # Number of neurons in the LSTM layer
 DENSE_UNITS = 50 # Number of neurons in the Dense layer
 EPOCHS = 20 # Number of epochs (iterations) for training
 BATCH_SIZE = 32 # Number of samples to use in each iteration
-NUM_FOLDS = 5 # Number of folds for cross-validation - 5 is the standard - 10 is also viable
+NUM_FOLDS = 10 # Number of folds for cross-validation - 5 is the standard - 10 is also viable
 RANDOM_STATE = 3203 
 OPTIMIZER = Adam()
+VERBOSE = 0
 
 # Load the dataset
 df = pd.read_csv('../data/spam.csv')
@@ -51,6 +51,11 @@ print('Selected features')
 
 # Define the K-fold Cross Validator
 kfold = KFold(n_splits=NUM_FOLDS, shuffle=True, random_state=RANDOM_STATE)
+
+# Placeholder for the best fold
+best_fold = -1
+best_val_accuracy = 0
+best_history = None
 
 # K-fold Cross Validation model evaluation
 fold_no = 1
@@ -76,19 +81,28 @@ for train, test in kfold.split(X_selected, y):
     print(f'Training for fold {fold_no} ...')
 
     # Fit data to model
-    history = model.fit(X_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE,  validation_data=(X_test, y_test), verbose=0) # Verbose=1 shows the progress bar, 
+    history = model.fit(X_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE,  validation_data=(X_test, y_test), verbose=VERBOSE)
 
     # Generate generalization metrics
-    scores = model.evaluate(X_test, y_test, verbose=0)
-    print(f'Score for fold {fold_no}: {model.metrics_names[0]} of {scores[0]}; {model.metrics_names[1]} of {scores[1]*100}%')
+    scores = model.evaluate(X_test, y_test, verbose=VERBOSE)
+    val_accuracy = scores[1]
+    print(f'Score for fold {fold_no}: {model.metrics_names[0]} of {scores[0]}; {model.metrics_names[1]} of {val_accuracy*100}%')
+    
+    # Check if the current fold is the best one
+    if val_accuracy > best_val_accuracy:
+        best_fold = fold_no
+        best_val_accuracy = val_accuracy
+        best_history = history
+    
     fold_no += 1
 
-    # == Plot Training and Validation Loss for each fold ==
-    plt.plot(history.history['loss'], label=f'Training Loss for fold {fold_no}')
-    plt.plot(history.history['val_loss'], label=f'Validation Loss for fold {fold_no}')
+print(f'Best fold: {best_fold}, with validation accuracy: {best_val_accuracy*100}%')
 
-plt.title('Training and Validation Loss')
+# Plot the training and validation accuracy of the best fold
+plt.plot(best_history.history['accuracy'], label='Training Accuracy')
+plt.plot(best_history.history['val_accuracy'], label='Validation Accuracy')
+plt.title('Training and Validation Accuracy')
 plt.xlabel('Epochs')
-plt.ylabel('Loss')
+plt.ylabel('Accuracy')
 plt.legend()
 plt.show()
