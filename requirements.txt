@@ -2,3 +2,6 @@ pandas
 scikit-learn
 nltk
 joblib
+matplotlib
+wordcloud
+pillow
