@@ -5,6 +5,10 @@
 # The model is plotted only once after the cross-validation process.
 # The model is saved to a file after the cross-validation process.
 
+import sys
+import string
+import re
+sys.path.append("..")
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -16,6 +20,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout
 from tensorflow.keras.regularizers import l1_l2
 from tensorflow.keras.optimizers.legacy import Adam
+from data_loading import get_spam_dataset
+
 
 # Constants and Variables for Hyperparameter Tuning
 L1_REGULARIZATION = 0.01 # L1 Regularization
@@ -31,12 +37,11 @@ OPTIMIZER = Adam()
 VERBOSE = 0
 
 # Load the dataset
-df = pd.read_csv('../data/spam.csv')
-print('Loaded dataset')
+df = get_spam_dataset()
 
-# Split the data
-X = df.iloc[:, 1:-1].values  # Exclude the first and last column
-y = df.iloc[:, -1].values
+
+print('Loaded dataset')
+X, y = df[['Body']], df['Label'].values
 print('Split the data')
 
 # Normalize the data
