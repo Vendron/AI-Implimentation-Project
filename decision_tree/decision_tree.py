@@ -6,6 +6,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report
 import sys
+import joblib
 
 sys.path.append("..")
 
@@ -59,3 +60,5 @@ plt.show()
 
 print("Training Accuracy:", train_accuracy)
 print("Test Accuracy:", test_accuracy)
+
+joblib.dump(best_estimator, 'decision_tree.plk')
